@@ -1,0 +1,88 @@
+{title: The Joy}
+{artist: Andrew Holt, Mitch Wong}
+{subtitle: (based on the recording by The Belonging Co, feat. David Dennis)}
+{key: Db}
+{tempo: 132}
+{time: 4/4}
+{ccli_license: 22714083}
+{ccli: 7209419}
+{copyright: 2023 Andrew Holt Music Publishing | TBCO Publishing | A Wong Made Write Publishing | Integrity's Praise! Music}
+{footer: For use solely with the SongSelect® Terms of Use. All rights reserved. www.ccli.com}
+
+{comment: Intro}
+  [|][Db]          [|][Db]          [|][Db]          [|][Db]           [|]
+[||:][Db]          [|][Ebm]       [|][Gb]          [|][Gb]          [:||]
+
+{comment: Verse 1}
+[Db]This is the day You made
+So, I’ll re - [Bbm]joice and be glad, re - [Gb]joice and be glad in [Db]it
+[Db]This is where I believe
+That You are [Bbm]more than enough, [Gb]more than enough for [Db]me
+
+{comment: Pre-Chorus}
+You are [Gb]faithful to Your promise, You are [Ab]strong when I am [Db]weak
+When I’m [Gb]standing in Your presence, I have [Ab]ev'rything I need
+
+{comment: Chorus 1}
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Gb] strength
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Gb] strength
+[Bbm]O my soul, [Ab]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Db] strength
+
+{comment: Turnaround}
+[|][Db]          [|][Ebm]       [|][Gb]          [|][Gb]          [|]
+
+{comment: Verse 2}
+[Db]Jesus, come what may
+You are [Bbm]worthy of all, [Gb]worthy of all my [Db]praise (To Pre-Chorus)
+
+{comment: Instrumental 1}
+[||:][Db]          [|][Ebm]       [|][Gb]          [|][Gb]          [:||]
+
+{comment: Bridge}
+Let it [Ab]rise up like a [Gb]river,   [Db]     over - [Ab]flowing, Holy [Gb]Spirit   [Db]
+Let it [Ab]pour out with no [Gb]limit,   [Db]     over - [Ab]flowing, Holy [Gb]Spirit   [Db]
+Let it [Ab]rise up like a [Gb]river,   [Db]     over - [Ab]flowing, Holy [Gb]Spirit   [Db]
+Let it [Ab]pour out with no [Gb]limit,   [Db/F]     over - [Ab]flowing, Holy [Gb]Spirit
+
+{comment: Instrumental 2}
+[||:][N.C.]        [|][N.C.]        [|][N.C.]        [|][N.C.]        [:||]
+[||:][Db]          [|][Ebm]       [|][Gb]          [|][Gb]          [:||]
+
+{comment: Chorus 2}
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Gb] strength
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Gb] strength
+[Bbm]O my soul, [Ab]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+[Bbm]O my soul, [Ab]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+[Bbm]O my soul, [Ab/C]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Db] strength
+
+{comment: Instrumental 3}
+[||:][Db]          [|][Ebm]       [|][Gb]          [|][Gb]          [:||][Db]          [|]
+
+{comment: Tag}
+I've got the [Db]joy, I've got the joy, I've got the [Ebm]joy
+It's the [Gb]joy of the Lord, it's the [Gb]joy of the Lord
+(REPEAT)
+
+{comment: Instrumental 4}
+[||:][Db]          [|][Ebm]       [|][Gb]          [|][Gb]          [:||]
+
+{comment: Ending}
+[Bbm]O my soul, [Ab]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+[Bbm]O my soul, [Ab]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+[Bbm]O my soul, [Ab/C]bless His Name
+[Db/F]All that is with - [Ebm]in me say
+The [Db]joy of the Lord, the [Ebm]joy of the Lord is my [Db]strength
+
+
+CCLI Song # 7209419
+© 2023 Andrew Holt Music Publishing | TBCO Publishing | A Wong Made Write Publishing | Integrity's Praise! Music
+For use solely with the SongSelect® Terms of Use. All rights reserved. www.ccli.com
+CCLI License # 22714083
