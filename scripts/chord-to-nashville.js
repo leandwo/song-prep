@@ -183,36 +183,52 @@ function formatChord({ root, quality, bass }) {
   return bass ? `${root}${quality}/${bass}` : `${root}${quality}`;
 }
 
-// ---------------- Main ----------------
-const input = fs.readFileSync(inputPath, "utf8");
-const key = detectKey(input);
+// ---------------- Main function ----------------
+function convertToNashville(input) {
+  const key = detectKey(input);
 
-if (!key) {
-  console.error(
-    [
-      "Could not detect key from file.",
-      "Add one of these near the top:",
-      "  {key: D}",
-      "  {meta: key D}",
-      "  Key: D",
-      "Then re-run.",
-    ].join("\n"),
-  );
-  process.exit(1);
+  if (!key) {
+    throw new Error(
+      [
+        "Could not detect key from input.",
+        "Add one of these:",
+        "  {key: D}",
+        "  {meta: key D}",
+        "  Key: D",
+      ].join("\n"),
+    );
+  }
+
+  // Replace [CHORD] with [NASHVILLE]
+  const output = input.replace(/\[([^\]]+)\]/g, (match, inner) => {
+    const chord = parseChord(inner);
+    if (!chord) return match;
+
+    const n = chordToNashville(chord, key);
+    return `[${formatChord(n)}]`;
+  });
+
+  return output;
 }
 
-// Replace [CHORD] with [NASHVILLE]
-const output = input.replace(/\[([^\]]+)\]/g, (match, inner) => {
-  const chord = parseChord(inner);
-  if (!chord) return match;
+module.exports = { convertToNashville };
 
-  const n = chordToNashville(chord, key);
-  return `[${formatChord(n)}]`;
-});
+// ---------------- CLI ----------------
+if (require.main === module) {
+  const input = fs.readFileSync(inputPath, "utf8");
 
-if (outPath) {
-  fs.writeFileSync(outPath, output, "utf8");
-  console.log(`Wrote: ${path.resolve(outPath)} (key detected: ${key})`);
-} else {
-  process.stdout.write(output);
+  try {
+    const output = convertToNashville(input);
+
+    if (outPath) {
+      fs.writeFileSync(outPath, output, "utf8");
+      const key = detectKey(input);
+      console.log(`Wrote: ${path.resolve(outPath)} (key detected: ${key})`);
+    } else {
+      process.stdout.write(output);
+    }
+  } catch (error) {
+    console.error(error.message);
+    process.exit(1);
+  }
 }

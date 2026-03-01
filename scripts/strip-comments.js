@@ -31,16 +31,27 @@ if (!inputPath) {
 
 const outPath = getArg("--out");
 
-const input = fs.readFileSync(inputPath, "utf8");
-
-// Replace {comment: Something} with Something
-const output = input.replace(/\{\s*comment\s*:\s*([^}]+)\}/gi, (_, content) =>
-  content.trim(),
-);
-
-if (outPath) {
-  fs.writeFileSync(outPath, output, "utf8");
-  console.log(`Wrote: ${path.resolve(outPath)}`);
-} else {
-  process.stdout.write(output);
+// core functionality extracted into a reusable function
+function stripComments(text) {
+  // Replace {comment: Something} with Something
+  return text.replace(/\{\s*comment\s*:\s*([^}]+)\}/gi, (_, content) =>
+    content.trim(),
+  );
 }
+
+const input = fs.readFileSync(inputPath, "utf8");
+const output = stripComments(input);
+
+// only write to disk when invoked directly
+if (require.main === module) {
+  if (outPath) {
+    fs.writeFileSync(outPath, output, "utf8");
+    console.log(`Wrote: ${path.resolve(outPath)}`);
+  } else {
+    process.stdout.write(output);
+  }
+}
+
+// export for programmatic use
+module.exports = { stripComments };
+

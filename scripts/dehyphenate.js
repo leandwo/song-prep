@@ -20,24 +20,6 @@
 const fs = require("fs");
 const path = require("path");
 
-const argv = process.argv.slice(2);
-
-function getArg(name) {
-  const i = argv.indexOf(name);
-  return i === -1 ? null : (argv[i + 1] ?? null);
-}
-
-const inputPath = argv.find((a) => !a.startsWith("--"));
-if (!inputPath) {
-  console.error("Usage: node dehyphenate-chordpro.js <input.txt> [--out output.txt]");
-  process.exit(1);
-}
-
-const outPath = getArg("--out");
-
-const input = fs.readFileSync(inputPath, "utf8");
-const lines = input.split(/\r?\n/);
-
 function dehyphenateLine(line) {
   // Skip ChordPro directives entirely
   if (/^\s*\{.*\}\s*$/.test(line)) return line;
@@ -47,11 +29,36 @@ function dehyphenateLine(line) {
   return line.replace(/\s+-\s+/g, "");
 }
 
-const output = lines.map(dehyphenateLine).join("\n");
+function dehyphenate(input) {
+  const lines = input.split(/\r?\n/);
+  return lines.map(dehyphenateLine).join("\n");
+}
 
-if (outPath) {
-  fs.writeFileSync(outPath, output, "utf8");
-  console.log(`Wrote: ${path.resolve(outPath)}`);
-} else {
-  process.stdout.write(output);
+module.exports = { dehyphenate };
+
+// CLI functionality
+if (require.main === module) {
+  const argv = process.argv.slice(2);
+
+  function getArg(name) {
+    const i = argv.indexOf(name);
+    return i === -1 ? null : (argv[i + 1] ?? null);
+  }
+
+  const inputPath = argv.find((a) => !a.startsWith("--"));
+  if (!inputPath) {
+    console.error("Usage: node dehyphenate-chordpro.js <input.txt> [--out output.txt]");
+    process.exit(1);
+  }
+
+  const outPath = getArg("--out");
+  const input = fs.readFileSync(inputPath, "utf8");
+  const output = dehyphenate(input);
+
+  if (outPath) {
+    fs.writeFileSync(outPath, output, "utf8");
+    console.log(`Wrote: ${path.resolve(outPath)}`);
+  } else {
+    process.stdout.write(output);
+  }
 }
