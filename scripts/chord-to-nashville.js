@@ -151,9 +151,9 @@ function parseChord(chordText) {
     if (bm) bass = normalizeNote(bm[1].toUpperCase() + (bm[2] || ""));
   }
 
-  // If the suffix before the slash is a bare 2, 4, or 9, treat it as an "add".
+  // If the suffix starts with 2, 4, or 9, treat it as an "add".
   // e.g. "C2/G" -> quality should be "add2".
-  if (rest && /^\s*[249]\s*$/.test(rest)) {
+  if (rest && /^\s*[249]/.test(rest)) {
     rest = "add" + rest.trim();
   }
 
