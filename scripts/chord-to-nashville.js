@@ -186,7 +186,8 @@ function chordToNashville({ root, quality, bass }, keyRoot) {
 }
 
 function formatChord({ root, quality, bass }) {
-  return bass ? `${root}${quality}/${bass}` : `${root}${quality}`;
+  const formatted = quality === "5" ? `${root}(${quality})` : `${root}${quality}`;
+  return bass ? `${formatted}/${bass}` : formatted;
 }
 
 // ---------------- Main function ----------------
