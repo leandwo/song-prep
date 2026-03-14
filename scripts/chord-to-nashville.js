@@ -151,6 +151,12 @@ function parseChord(chordText) {
     if (bm) bass = normalizeNote(bm[1].toUpperCase() + (bm[2] || ""));
   }
 
+  // If the suffix before the slash is a bare 2, 4, or 9, treat it as an "add".
+  // e.g. "C2/G" -> quality should be "add2".
+  if (rest && /^\s*[249]\s*$/.test(rest)) {
+    rest = "add" + rest.trim();
+  }
+
   // Heuristic: avoid converting bracketed non-chords like [Verse 1]
   // If it contains spaces or starts with a digit/letter word patterns, treat as not a chord.
   // (ChordPro chords generally don't contain spaces.)
