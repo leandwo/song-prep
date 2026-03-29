@@ -212,7 +212,7 @@ function convertToNashville(input) {
     if (!chord) return match;
 
     const n = chordToNashville(chord, key);
-    return `[${formatChord(n)}]`;
+    return `[ ${formatChord(n)} ]`;
   });
 
   return output;
