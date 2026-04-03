@@ -21,25 +21,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// ---------------- CLI ----------------
-const argv = process.argv.slice(2);
-
-function getArg(name) {
-  const idx = argv.indexOf(name);
-  if (idx === -1) return null;
-  return argv[idx + 1] ?? null;
-}
-
-const inputPath = argv.find((a) => !a.startsWith("--"));
-if (!inputPath) {
-  console.error(
-    "Usage: node chordpro-to-nashville.js <input.txt> [--out output.txt]",
-  );
-  process.exit(1);
-}
-
-const outPath = getArg("--out");
-
 // ---------------- Music helpers ----------------
 const CHROMATIC_SHARPS = [
   "C",
@@ -222,6 +203,23 @@ module.exports = { convertToNashville };
 
 // ---------------- CLI ----------------
 if (require.main === module) {
+  const argv = process.argv.slice(2);
+
+  function getArg(name) {
+    const idx = argv.indexOf(name);
+    if (idx === -1) return null;
+    return argv[idx + 1] ?? null;
+  }
+
+  const inputPath = argv.find((a) => !a.startsWith("--"));
+  if (!inputPath) {
+    console.error(
+      "Usage: node chord-to-nashville.js <input.txt> [--out output.txt]",
+    );
+    process.exit(1);
+  }
+
+  const outPath = getArg("--out");
   const input = fs.readFileSync(inputPath, "utf8");
 
   try {
