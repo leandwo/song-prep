@@ -24,9 +24,12 @@ function dehyphenateLine(line) {
   // Skip ChordPro directives entirely
   if (/^\s*\{.*\}\s*$/.test(line)) return line;
 
-  // Replace " <spaces>-<spaces> " with nothing.
-  // This will naturally pull adjacent chord tags and lyric fragments together.
-  return line.replace(/\s+-\s+/g, "");
+  // Replace syllable-breaking hyphens with spaces and optional chords.
+  // Patterns to match:
+  //   "sepa  -  rate"  -> "separate"
+  //   "beat  [ 1(5) ]- en" -> "beat[ 1(5) ]en"
+  // Matches: spaces + optional chord in brackets + spaces + hyphen + spaces
+  return line.replace(/\s+((?:\[[^\]]+\])?)\s*-\s+/g, "$1");
 }
 
 function dehyphenate(input) {
