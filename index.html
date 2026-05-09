@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChordPro Converter</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <header>
+    <h1>ChordPro Converter</h1>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="card-header">
+        <h2>Input</h2>
+        <label class="file-btn">
+          Upload file
+          <input type="file" id="file-input" accept=".txt,.cho,.chopro,.pro">
+        </label>
+      </div>
+      <textarea
+        id="input"
+        placeholder="Paste a ChordPro song here, or drag and drop a file…"
+        spellcheck="false"
+      ></textarea>
+    </div>
+
+    <div class="card">
+      <h2>Transforms</h2>
+      <div class="transforms">
+        <label class="transform-option">
+          <input type="checkbox" id="t-nashville" checked>
+          <span class="label">
+            <strong>Nashville numbers</strong>
+            <small>Convert chords to scale-degree numbers relative to the key</small>
+          </span>
+        </label>
+        <label class="transform-option">
+          <input type="checkbox" id="t-dehyphenate" checked>
+          <span class="label">
+            <strong>Dehyphenate</strong>
+            <small>Join syllable-split words (sepa - rate → separate)</small>
+          </span>
+        </label>
+        <label class="transform-option">
+          <input type="checkbox" id="t-strip-comments" checked>
+          <span class="label">
+            <strong>Strip comments</strong>
+            <small>Convert {comment: …} directives to plain text</small>
+          </span>
+        </label>
+        <label class="transform-option">
+          <input type="checkbox" id="t-strip-header" checked>
+          <span class="label">
+            <strong>Strip header / footer</strong>
+            <small>Remove metadata block and CCLI footer</small>
+          </span>
+        </label>
+        <label class="transform-option">
+          <input type="checkbox" id="t-split-presentation">
+          <span class="label">
+            <strong>Split for presentation</strong>
+            <small>Break into 2-line slides for ProPresenter / lyric display</small>
+          </span>
+        </label>
+        <div class="transform-sub hidden" id="split-sub">
+          <label for="t-split-width">Max line width</label>
+          <input type="number" id="t-split-width" value="50" min="20" max="120" step="5">
+          <span class="transform-sub-unit">chars</span>
+        </div>
+      </div>
+      <button class="btn-primary" id="process-btn">Process</button>
+    </div>
+
+    <div class="error hidden" id="error"></div>
+
+    <div class="card hidden" id="output-section">
+      <div class="card-header">
+        <h2>Output</h2>
+        <div class="output-actions">
+          <button class="btn-secondary" id="copy-btn">Copy</button>
+          <button class="btn-secondary" id="download-btn">Download</button>
+        </div>
+      </div>
+      <pre id="output"></pre>
+    </div>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

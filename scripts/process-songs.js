@@ -1,37 +1,29 @@
 #!/usr/bin/env node
+import { convertToNashville } from './chord-to-nashville.js';
+import { dehyphenate } from './dehyphenate.js';
+import { stripComments } from './strip-comments.js';
+import { stripHeaderFooter } from './strip-header-footer.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const { stripHeaderFooter } = require("./strip-header-footer.js");
-const { stripComments } = require("./strip-comments.js");
-const { dehyphenate } = require("./dehyphenate.js");
-const { convertToNashville } = require("./chord-to-nashville.js");
-
-const fs = require("fs");
-const path = require("path");
-
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const argv = process.argv.slice(2);
 
-function hasFlag(flag) {
-  return argv.includes(flag);
-}
-
+function hasFlag(flag) { return argv.includes(flag); }
 function getArg(name) {
   const idx = argv.indexOf(name);
   return idx === -1 ? null : (argv[idx + 1] ?? null);
 }
 
-// Get input and output directories
-const inputDir = getArg("--input") || path.join(__dirname, "..", "input");
-const outputDir = getArg("--output") || path.join(__dirname, "..", "output");
+const inputDir  = getArg('--input')  || path.join(__dirname, '..', 'input');
+const outputDir = getArg('--output') || path.join(__dirname, '..', 'output');
 
-// Ensure output directory exists
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
-}
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-// Get all files from input directory
-const files = fs.readdirSync(inputDir).filter((file) => {
-  return fs.statSync(path.join(inputDir, file)).isFile() && file.endsWith(".txt");
-});
+const files = fs.readdirSync(inputDir).filter((file) =>
+  fs.statSync(path.join(inputDir, file)).isFile() && file.endsWith('.txt')
+);
 
 if (files.length === 0) {
   console.log(`No files found in ${inputDir}`);
@@ -43,30 +35,16 @@ let errorCount = 0;
 
 for (const file of files) {
   try {
-    const inputPath = path.join(inputDir, file);
+    const inputPath  = path.join(inputDir, file);
     const outputPath = path.join(outputDir, file);
+    let text = fs.readFileSync(inputPath, 'utf8');
 
-    let text = fs.readFileSync(inputPath, "utf8");
+    if (!hasFlag('--skip-numbers'))     text = convertToNashville(text);
+    if (!hasFlag('--skip-dehyphenate')) text = dehyphenate(text);
+    if (!hasFlag('--skip-comments'))    text = stripComments(text);
+    if (!hasFlag('--skip-header'))      text = stripHeaderFooter(text);
 
-    // Apply transforms conditionally
-    if (!hasFlag("--skip-numbers")) {
-      text = convertToNashville(text);
-    }
-
-    if (!hasFlag("--skip-dehyphenate")) {
-      text = dehyphenate(text);
-    }
-
-    if (!hasFlag("--skip-comments")) {
-      text = stripComments(text);
-    }
-
-    if (!hasFlag("--skip-header")) {
-      text = stripHeaderFooter(text);
-    }
-
-    // Write output
-    fs.writeFileSync(outputPath, text, "utf8");
+    fs.writeFileSync(outputPath, text, 'utf8');
     console.log(`✓ Processed: ${file}`);
     processedCount++;
   } catch (err) {
