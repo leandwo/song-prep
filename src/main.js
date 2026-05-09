@@ -66,10 +66,15 @@ function updateTransformsCount() {
 
 loadSettings();
 updateTransformsCount();
+updateSliderFill();
 
 document.querySelectorAll('.transforms input[type="checkbox"]').forEach(cb => {
   cb.addEventListener('change', () => { saveSettings(); updateTransformsCount(); });
 });
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 function stripChords(text) {
   return text
@@ -78,27 +83,65 @@ function stripChords(text) {
     .join('\n');
 }
 
+// Detect which line indices are section labels using the chords-present text.
+// A label is a non-empty line with no '[' that follows a blank line or the start.
+// We always derive this from the original (with-chords) text so the detection
+// survives the "hide chords" toggle where lyrics also lose their '['.
+function labelIndices(text) {
+  const lines = text.split('\n');
+  const idx = new Set();
+  lines.forEach((line, i) => {
+    const prev = lines[i - 1];
+    if (line.trim() && !line.includes('[') && (prev === undefined || prev.trim() === '')) {
+      idx.add(i);
+    }
+  });
+  return idx;
+}
+
+function renderLines(text, labels) {
+  return text
+    .split('\n')
+    .map((line, i) => {
+      const e = escapeHtml(line);
+      return labels.has(i) ? `<span class="section-label">${e}</span>` : e;
+    })
+    .join('\n');
+}
+
 let chordsVisible = true;
-let renderedText  = null; // full output with chords, re-used by the toggle
+let renderedText  = null;
 
 function setOutput(text) {
   renderedText = text;
-  outputEl.textContent = chordsVisible ? text : stripChords(text);
+  const labels  = labelIndices(text);
+  const display = chordsVisible ? text : stripChords(text);
+  outputEl.innerHTML = renderLines(display, labels);
 }
 
 toggleChordsBtn.addEventListener('click', () => {
   chordsVisible = !chordsVisible;
   toggleChordsBtn.textContent = chordsVisible ? 'Hide chords' : 'Show chords';
-  if (renderedText) outputEl.textContent = chordsVisible ? renderedText : stripChords(renderedText);
+  if (renderedText) {
+    const labels  = labelIndices(renderedText);
+    const display = chordsVisible ? renderedText : stripChords(renderedText);
+    outputEl.innerHTML = renderLines(display, labels);
+  }
 });
 
 // Text after all transforms except split — re-used when slider moves
 let baseText = null;
 
+function updateSliderFill() {
+  const pct = ((splitSlider.value - splitSlider.min) / (splitSlider.max - splitSlider.min)) * 100;
+  splitSlider.style.setProperty('--fill', `${pct}%`);
+}
+
 function applySliderSplit() {
   if (!baseText) return;
   const maxWidth = parseInt(splitSlider.value, 10) || 50;
   splitWidthVal.textContent = maxWidth;
+  updateSliderFill();
   setOutput(splitForPresentation(baseText, { maxWidth }));
 }
 

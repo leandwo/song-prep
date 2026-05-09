@@ -98,10 +98,12 @@
           </div>
         </div>
         <div class="output-split-controls hidden" id="output-split-controls">
-          <label for="t-split-width">Max line width</label>
+          <label for="t-split-width">Max width</label>
           <input type="range" id="t-split-width" value="50" min="20" max="80" step="1" />
-          <span id="split-width-value">50</span>
-          <span class="split-width-unit">chars</span>
+          <div class="split-width-display">
+            <span id="split-width-value">50</span>
+            <span class="split-width-unit">ch</span>
+          </div>
         </div>
         <pre id="output"></pre>
       </div>
