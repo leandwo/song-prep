@@ -1,7 +1,32 @@
 function wrapLine(line, maxWidth) {
   if (line.length <= maxWidth) return [line];
+
   const words = line.split(' ');
-  const wrapped = [];
+  if (words.length === 1) return [line];
+
+  // Try every word boundary; pick the split with the smallest length difference
+  // that still keeps both halves within maxWidth.
+  let bestSplit = null;
+  let bestDiff = Infinity;
+
+  for (let i = 1; i < words.length; i++) {
+    const left  = words.slice(0, i).join(' ');
+    const right = words.slice(i).join(' ');
+    if (left.length > maxWidth || right.length > maxWidth) continue;
+    const diff = Math.abs(left.length - right.length);
+    if (diff < bestDiff) {
+      bestDiff  = diff;
+      bestSplit = [left, right];
+    }
+  }
+
+  if (bestSplit) {
+    // Recurse in case either half still needs splitting
+    return [...wrapLine(bestSplit[0], maxWidth), ...wrapLine(bestSplit[1], maxWidth)];
+  }
+
+  // Fallback: greedy wrap (handles words that are individually > maxWidth)
+  const result = [];
   let current = '';
   for (const word of words) {
     if (!current) {
@@ -9,12 +34,12 @@ function wrapLine(line, maxWidth) {
     } else if (current.length + 1 + word.length <= maxWidth) {
       current += ' ' + word;
     } else {
-      wrapped.push(current);
+      result.push(current);
       current = word;
     }
   }
-  if (current) wrapped.push(current);
-  return wrapped.length > 0 ? wrapped : [line];
+  if (current) result.push(current);
+  return result.length > 0 ? result : [line];
 }
 
 export function splitForPresentation(input, { maxWidth = 50, linesPerSlide = 2 } = {}) {
