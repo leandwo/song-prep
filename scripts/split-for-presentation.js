@@ -1,45 +1,47 @@
-function wrapLine(line, maxWidth) {
+export function wrapLine(line, maxWidth) {
   if (line.length <= maxWidth) return [line];
 
-  const words = line.split(' ');
-  if (words.length === 1) return [line];
+  // Only split on spaces that are outside [...] brackets.
+  // Spaces inside brackets are part of chord notation, and text with no space
+  // between ] and the next word (e.g. "[ 4m ]word") has no split point there.
+  const splits = [];
+  let depth = 0;
+  for (let i = 0; i < line.length; i++) {
+    if      (line[i] === '[') depth++;
+    else if (line[i] === ']') depth--;
+    else if (line[i] === ' ' && depth === 0) splits.push(i);
+  }
 
-  // Try every word boundary; pick the split with the smallest length difference
-  // that still keeps both halves within maxWidth.
-  let bestSplit = null;
-  let bestDiff = Infinity;
+  if (splits.length === 0) return [line];
 
-  for (let i = 1; i < words.length; i++) {
-    const left  = words.slice(0, i).join(' ');
-    const right = words.slice(i).join(' ');
+  // Among valid split positions, pick the one with the smallest length difference
+  // between the two halves, as long as both fit within maxWidth.
+  let bestLeft = null, bestRight = null, bestDiff = Infinity;
+  for (const pos of splits) {
+    const left  = line.slice(0, pos);
+    const right = line.slice(pos + 1);
     if (left.length > maxWidth || right.length > maxWidth) continue;
     const diff = Math.abs(left.length - right.length);
     if (diff < bestDiff) {
-      bestDiff  = diff;
-      bestSplit = [left, right];
+      bestDiff = diff;
+      bestLeft  = left;
+      bestRight = right;
     }
   }
 
-  if (bestSplit) {
-    // Recurse in case either half still needs splitting
-    return [...wrapLine(bestSplit[0], maxWidth), ...wrapLine(bestSplit[1], maxWidth)];
+  if (bestLeft !== null) {
+    return [...wrapLine(bestLeft, maxWidth), ...wrapLine(bestRight, maxWidth)];
   }
 
-  // Fallback: greedy wrap (handles words that are individually > maxWidth)
-  const result = [];
-  let current = '';
-  for (const word of words) {
-    if (!current) {
-      current = word;
-    } else if (current.length + 1 + word.length <= maxWidth) {
-      current += ' ' + word;
-    } else {
-      result.push(current);
-      current = word;
+  // Greedy fallback: take the longest left segment that fits, recurse on the rest.
+  for (let i = splits.length - 1; i >= 0; i--) {
+    const left = line.slice(0, splits[i]);
+    if (left.length <= maxWidth) {
+      return [left, ...wrapLine(line.slice(splits[i] + 1), maxWidth)];
     }
   }
-  if (current) result.push(current);
-  return result.length > 0 ? result : [line];
+
+  return [line];
 }
 
 export function splitForPresentation(input, { maxWidth = 50, linesPerSlide = 2 } = {}) {
