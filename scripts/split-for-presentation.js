@@ -1,9 +1,15 @@
-export function wrapLine(line, maxWidth) {
-  if (line.length <= maxWidth) return [line];
+// Length of a string excluding [...] chord brackets — used for balance calculations
+// so that chord notation doesn't skew how lyric lines are distributed.
+function lyricLength(s) {
+  return s.replace(/\[[^\]]*\]/g, '').length;
+}
 
-  // Only split on spaces that are outside [...] brackets.
-  // Spaces inside brackets are part of chord notation, and text with no space
-  // between ] and the next word (e.g. "[ 4m ]word") has no split point there.
+export function wrapLine(line, maxWidth) {
+  if (lyricLength(line) <= maxWidth) return [line];
+
+  // Collect valid split positions: spaces outside [...] brackets.
+  // Spaces inside brackets are chord notation; text with no space between ]
+  // and the next word (e.g. "[ 4m ]word") has no split point there naturally.
   const splits = [];
   let depth = 0;
   for (let i = 0; i < line.length; i++) {
@@ -14,34 +20,49 @@ export function wrapLine(line, maxWidth) {
 
   if (splits.length === 0) return [line];
 
-  // Among valid split positions, pick the one with the smallest length difference
-  // between the two halves, as long as both fit within maxWidth.
-  let bestLeft = null, bestRight = null, bestDiff = Infinity;
-  for (const pos of splits) {
-    const left  = line.slice(0, pos);
-    const right = line.slice(pos + 1);
-    if (left.length > maxWidth || right.length > maxWidth) continue;
-    const diff = Math.abs(left.length - right.length);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      bestLeft  = left;
-      bestRight = right;
-    }
-  }
-
-  if (bestLeft !== null) {
-    return [...wrapLine(bestLeft, maxWidth), ...wrapLine(bestRight, maxWidth)];
-  }
-
-  // Greedy fallback: take the longest left segment that fits, recurse on the rest.
-  for (let i = splits.length - 1; i >= 0; i--) {
-    const left = line.slice(0, splits[i]);
-    if (left.length <= maxWidth) {
-      return [left, ...wrapLine(line.slice(splits[i] + 1), maxWidth)];
-    }
+  // Try the minimum number of lines needed, increasing until a valid split exists.
+  // For each n, consider all combinations of split points and pick the one that
+  // minimises variance across the resulting line lengths — so 3 lines come out
+  // as even as possible rather than the recursive 2-way approach, which can
+  // leave a short middle segment.
+  for (let n = 2; n <= splits.length + 1; n++) {
+    const result = balancedSplit(line, splits, n, maxWidth);
+    if (result) return result;
   }
 
   return [line];
+}
+
+// Returns the most balanced split of `line` into exactly `n` parts,
+// each ≤ maxWidth chars. Tries every valid combination of split points
+// and picks the one with minimum length variance. Returns null if impossible.
+function balancedSplit(line, splits, n, maxWidth) {
+  if (n === 1) return lyricLength(line) <= maxWidth ? [line] : null;
+
+  let bestParts    = null;
+  let bestVariance = Infinity;
+
+  for (const pos of splits) {
+    const left = line.slice(0, pos);
+    if (lyricLength(left) > maxWidth) continue;
+
+    const rest       = line.slice(pos + 1);
+    const restSplits = splits.filter(s => s > pos).map(s => s - pos - 1);
+    const restParts  = balancedSplit(rest, restSplits, n - 1, maxWidth);
+    if (!restParts) continue;
+
+    const parts    = [left, ...restParts];
+    const lengths  = parts.map(lyricLength);
+    const avg      = lengths.reduce((sum, l) => sum + l, 0) / n;
+    const variance = lengths.reduce((sum, l) => sum + (l - avg) ** 2, 0);
+
+    if (variance < bestVariance) {
+      bestVariance = variance;
+      bestParts    = parts;
+    }
+  }
+
+  return bestParts;
 }
 
 export function splitForPresentation(input, { maxWidth = 50, linesPerSlide = 2 } = {}) {

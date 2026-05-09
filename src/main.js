@@ -17,6 +17,7 @@ const splitCheck           = document.getElementById('t-split-presentation');
 const outputSplitControls  = document.getElementById('output-split-controls');
 const splitSlider          = document.getElementById('t-split-width');
 const splitWidthVal        = document.getElementById('split-width-value');
+const toggleChordsBtn      = document.getElementById('toggle-chords-btn');
 
 const checks = {
   nashville:     () => document.getElementById('t-nashville').checked,
@@ -70,6 +71,27 @@ document.querySelectorAll('.transforms input[type="checkbox"]').forEach(cb => {
   cb.addEventListener('change', () => { saveSettings(); updateTransformsCount(); });
 });
 
+function stripChords(text) {
+  return text
+    .split('\n')
+    .map(line => line.replace(/\[[^\]]*\]/g, '').replace(/\s+/g, ' ').trim())
+    .join('\n');
+}
+
+let chordsVisible = true;
+let renderedText  = null; // full output with chords, re-used by the toggle
+
+function setOutput(text) {
+  renderedText = text;
+  outputEl.textContent = chordsVisible ? text : stripChords(text);
+}
+
+toggleChordsBtn.addEventListener('click', () => {
+  chordsVisible = !chordsVisible;
+  toggleChordsBtn.textContent = chordsVisible ? 'Hide chords' : 'Show chords';
+  if (renderedText) outputEl.textContent = chordsVisible ? renderedText : stripChords(renderedText);
+});
+
 // Text after all transforms except split — re-used when slider moves
 let baseText = null;
 
@@ -77,7 +99,7 @@ function applySliderSplit() {
   if (!baseText) return;
   const maxWidth = parseInt(splitSlider.value, 10) || 50;
   splitWidthVal.textContent = maxWidth;
-  outputEl.textContent = splitForPresentation(baseText, { maxWidth });
+  setOutput(splitForPresentation(baseText, { maxWidth }));
 }
 
 splitSlider.addEventListener('input', () => { applySliderSplit(); saveSettings(); });
@@ -89,7 +111,7 @@ splitCheck.addEventListener('change', () => {
     applySliderSplit();
     outputSplitControls.classList.remove('hidden');
   } else {
-    outputEl.textContent = baseText;
+    setOutput(baseText);
     outputSplitControls.classList.add('hidden');
   }
 });
@@ -138,7 +160,7 @@ processBtn.addEventListener('click', () => {
       applySliderSplit();
       outputSplitControls.classList.remove('hidden');
     } else {
-      outputEl.textContent = text;
+      setOutput(text);
     }
 
     outputSection.classList.remove('hidden');
@@ -150,13 +172,13 @@ processBtn.addEventListener('click', () => {
 });
 
 copyBtn.addEventListener('click', async () => {
-  await navigator.clipboard.writeText(outputEl.textContent);
+  await navigator.clipboard.writeText(renderedText ?? outputEl.textContent);
   copyBtn.textContent = 'Copied!';
   setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
 });
 
 downloadBtn.addEventListener('click', () => {
-  const blob = new Blob([outputEl.textContent], { type: 'text/plain' });
+  const blob = new Blob([renderedText ?? outputEl.textContent], { type: 'text/plain' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
