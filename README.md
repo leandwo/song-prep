@@ -15,6 +15,8 @@ SongPrep runs a configurable pipeline of transforms on ChordPro-formatted songs:
 | **Strip comments** | Converts `{comment: …}` directives to plain text |
 | **Strip parentheses** | Removes parenthetical notes like `(v2 only)` |
 | **Strip header / footer** | Removes the metadata block at the top and the CCLI footer |
+| **Lyrics only** | Removes all `[chord]` brackets, dropping chord-only lines (e.g. instrumentals) |
+| **Custom sequence** | Reorders and repeats sections by label (e.g. `Verse 1, Chorus, Chorus, Bridge, Ending`) |
 | **Split for presentation** | Breaks lyrics into 2-line slides sized for a display width you control |
 
 The split transform keeps wrapped lines together in the same slide and balances line lengths across multi-line wraps.

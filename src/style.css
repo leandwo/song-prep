@@ -203,6 +203,24 @@ pre {
   color: #999;
 }
 
+.sequence-input {
+  width: 100%;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 13px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 9px 12px;
+  background: #fafafa;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.sequence-input:focus {
+  border-color: #5b7cf7;
+  background: #fff;
+}
+
 /* ── Buttons ──────────────────────────────────── */
 
 button {

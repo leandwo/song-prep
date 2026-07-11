@@ -76,6 +76,27 @@
               </span>
             </label>
             <label class="transform-option">
+              <input type="checkbox" id="t-lyrics-only" />
+              <span class="label">
+                <strong>Lyrics only</strong>
+                <small>Remove all [chord] brackets, keeping just the lyrics</small>
+              </span>
+            </label>
+            <label class="transform-option">
+              <input type="checkbox" id="t-sequence" />
+              <span class="label">
+                <strong>Custom sequence</strong>
+                <small>Reorder and repeat sections by label, comma-separated</small>
+              </span>
+            </label>
+            <input
+              type="text"
+              id="t-sequence-input"
+              class="sequence-input hidden"
+              placeholder="e.g. Verse 1, Chorus, Verse 2, Chorus, Bridge, Chorus, Ending"
+              spellcheck="false"
+            />
+            <label class="transform-option">
               <input type="checkbox" id="t-split-presentation" checked />
               <span class="label">
                 <strong>Split for presentation</strong>

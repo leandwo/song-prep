@@ -4,6 +4,8 @@ import { stripComments } from '../scripts/strip-comments.js';
 import { stripHeaderFooter } from '../scripts/strip-header-footer.js';
 import { stripParens } from '../scripts/strip-parens.js';
 import { splitForPresentation } from '../scripts/split-for-presentation.js';
+import { stripChords as lyricsOnly } from '../scripts/strip-chords.js';
+import { applySequence, parseSections } from '../scripts/apply-sequence.js';
 
 const inputEl              = document.getElementById('input');
 const fileInput            = document.getElementById('file-input');
@@ -18,6 +20,8 @@ const outputSplitControls  = document.getElementById('output-split-controls');
 const splitSlider          = document.getElementById('t-split-width');
 const splitWidthVal        = document.getElementById('split-width-value');
 const toggleChordsBtn      = document.getElementById('toggle-chords-btn');
+const sequenceCheck        = document.getElementById('t-sequence');
+const sequenceInput        = document.getElementById('t-sequence-input');
 
 const checks = {
   nashville:     () => document.getElementById('t-nashville').checked,
@@ -25,6 +29,8 @@ const checks = {
   stripComments: () => document.getElementById('t-strip-comments').checked,
   stripParens:   () => document.getElementById('t-strip-parens').checked,
   stripHeader:   () => document.getElementById('t-strip-header').checked,
+  lyricsOnly:    () => document.getElementById('t-lyrics-only').checked,
+  sequence:      () => sequenceCheck.checked,
   split:         () => splitCheck.checked,
 };
 
@@ -38,6 +44,9 @@ function saveSettings() {
     stripComments: document.getElementById('t-strip-comments').checked,
     stripParens:   document.getElementById('t-strip-parens').checked,
     stripHeader:   document.getElementById('t-strip-header').checked,
+    lyricsOnly:    document.getElementById('t-lyrics-only').checked,
+    sequence:      sequenceCheck.checked,
+    sequenceText:  sequenceInput.value,
     split:         splitCheck.checked,
     splitWidth:    parseInt(splitSlider.value, 10),
   }));
@@ -53,6 +62,9 @@ function loadSettings() {
     restore('t-strip-comments', s.stripComments);
     restore('t-strip-parens',   s.stripParens);
     restore('t-strip-header',   s.stripHeader);
+    restore('t-lyrics-only',    s.lyricsOnly);
+    restore('t-sequence',       s.sequence);
+    if (s.sequenceText !== undefined) sequenceInput.value = s.sequenceText;
     if (s.split !== undefined) splitCheck.checked = s.split;
     if (s.splitWidth) { splitSlider.value = s.splitWidth; splitWidthVal.textContent = s.splitWidth; }
   } catch {}
@@ -64,9 +76,17 @@ function updateTransformsCount() {
   document.getElementById('transforms-count').textContent = `${checked} of ${all.length} active`;
 }
 
+function updateSequenceInputVisibility() {
+  sequenceInput.classList.toggle('hidden', !sequenceCheck.checked);
+}
+
 loadSettings();
 updateTransformsCount();
 updateSliderFill();
+updateSequenceInputVisibility();
+
+sequenceCheck.addEventListener('change', updateSequenceInputVisibility);
+sequenceInput.addEventListener('input', saveSettings);
 
 document.querySelectorAll('.transforms input[type="checkbox"]').forEach(cb => {
   cb.addEventListener('change', () => { saveSettings(); updateTransformsCount(); });
@@ -87,12 +107,21 @@ function stripChords(text) {
 // A label is a non-empty line with no '[' that follows a blank line or the start.
 // We always derive this from the original (with-chords) text so the detection
 // survives the "hide chords" toggle where lyrics also lose their '['.
+// When the lyrics-only transform runs, no line has a '[' — so we also require
+// the line to match a label name captured before the chords were stripped.
+let knownLabels = null;
+
 function labelIndices(text) {
   const lines = text.split('\n');
   const idx = new Set();
   lines.forEach((line, i) => {
     const prev = lines[i - 1];
-    if (line.trim() && !line.includes('[') && (prev === undefined || prev.trim() === '')) {
+    if (
+      line.trim() &&
+      !line.includes('[') &&
+      (prev === undefined || prev.trim() === '') &&
+      (knownLabels === null || knownLabels.has(line.trim()))
+    ) {
       idx.add(i);
     }
   });
@@ -196,6 +225,16 @@ processBtn.addEventListener('click', () => {
     if (checks.stripComments()) text = stripComments(text);
     if (checks.stripParens())   text = stripParens(text);
     if (checks.stripHeader())   text = stripHeaderFooter(text);
+    if (checks.sequence())      text = applySequence(text, sequenceInput.value);
+
+    if (checks.lyricsOnly()) {
+      knownLabels = new Set(
+        parseSections(text).filter(s => s.label !== null).map(s => s.label)
+      );
+      text = lyricsOnly(text);
+    } else {
+      knownLabels = null;
+    }
 
     baseText = text;
 
